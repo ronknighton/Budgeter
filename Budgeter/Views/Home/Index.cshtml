@@ -1,0 +1,194 @@
+﻿@using Budgeter.Helpers
+
+@{
+    ViewBag.Title = "Home Page";
+    var usersHelper = new UsersHelper();
+}
+
+
+
+<div class="col-md-offset-2 col-md-8">
+    <div class="tile">
+        <h1 class="center">Welcome to Money Management Software</h1>
+
+        <div id="QuickStart">
+            <h2>Quick Start Guide:</h2>
+            <label>MMS makes it easy to set budgets and track whether your spending is being kept within the budget parameters you have set.</label>
+            <ol id="tutorialIndex">
+                <li>Log In or Register (Upper right corner). <button type="button" class="btn btn-info btn-xs white" data-toggle="modal" data-target="#Login">Register/Login/Create Household VIDEO</button></li>
+                <li>
+                   @if (Request.IsAuthenticated && !usersHelper.HaveHousehold())
+                    {
+                        <span> Create a household by </span>@Html.ActionLink("CLICKING HERE", "Create", "Households") <span>...or use the link in the upper right corner.</span> 
+                   }
+                   else
+                   {
+                      <span>You have created a household so move on to step 3.</span>
+                   }
+                </li>
+                <li>After you create a household, you should create a budget and add Budget Items. <button type="button" class="btn btn-info btn-xs white" data-toggle="modal" data-target="#AddAccount">Add Bank Account and Create Budget VIDEO</button></li>
+                <li>After that, add bank account(s)</li>
+                <li>You then start to enter transactions. Every transaction has the option to be linked to a budget item.<button id="VideoTutorial" type="button" class="btn btn-info btn-xs white" data-toggle="modal" data-target="#Transactions">Entering Transactions VIDEO</button></li>
+                <li>At any time after you create a household, you can invite other people to join, or manually enter them. <button type="button" class="btn btn-info btn-xs white" data-toggle="modal" data-target="#AddMembers">Add Household Members VIDEO</button></li>
+                <li>The charting feature allows you to make a quick visual assessment of your budget and spending. <button type="button" class="btn btn-info btn-xs white" data-toggle="modal" data-target="#Charts">Using the Charts VIDEO</button></li>
+                <li>Everything can be accessed from either the My Households view or in the left-side nav-bar.</li>
+
+            </ol>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="Login" role="dialog">
+    <div class="modal-dialog modal-lg custom-modal">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h2 class="modal-title">MMS Register/Login and Create Household</h2>
+            </div>
+            <div class="modal-body">
+                <iframe id="LoginVideo" height="400" width="600" src="//www.youtube.com/embed/BgqZyNUkxbw" frameborder="0" allowfullscreen></iframe>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="AddMembers" role="dialog">
+    <div class="modal-dialog modal-lg custom-modal">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h2 class="modal-title">MMS Add Household Members</h2>
+            </div>
+            <div class="modal-body">
+                <iframe id="AddMembersVideo" height="400" width="600" src="//www.youtube.com/embed/bmFg_HSO8EI" frameborder="0" allowfullscreen></iframe>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="AddAccount" role="dialog">
+    <div class="modal-dialog modal-lg custom-modal">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h2 class="modal-title">MMS Add Bank Account and Create Budget</h2>
+            </div>
+            <div class="modal-body">
+                <iframe id="AddAccountVideo" height="400" width="600"  src="//www.youtube.com/embed/p3j5pzbBtug" frameborder="0" allowfullscreen></iframe>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="Transactions" role="dialog">
+    <div class="modal-dialog modal-lg custom-modal">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h2 class="modal-title">MMS Transactions</h2>
+            </div>
+            <div class="modal-body">
+                <iframe id="TransactionsVideo" height="400" width="600"  src="//www.youtube.com/embed/p-_Qw6LazrU" frameborder="0" allowfullscreen></iframe>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="Charts" role="dialog">
+    <div class="modal-dialog modal-lg custom-modal">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h2 class="modal-title">MMS Using the Charts</h2>
+            </div>
+            <div class="modal-body">
+                <iframe id="ChartsVideo" height="400" width="600"  src="//www.youtube.com/embed/Yr8iKzhjXkg" frameborder="0" allowfullscreen></iframe>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            /* Get iframe src attribute value i.e. YouTube video url
+
+            and store it in a variable */
+            var url = "";
+
+
+            //var url = $("#LoginVideo").attr('src');
+            //url = $("#AddMembersVideo").attr('src');
+            //url = $("#AddAccountVideo").attr('src');
+            //url = $("#TransactionsVideo").attr('src');
+            //url = $("#ChartsVideo").attr('src');
+
+
+
+            /* Assign empty url value to the iframe src attribute when
+
+            modal hide, which stop the video playing */
+
+            $("#Login").on('hide.bs.modal', function () {
+                $("#LoginVideo").attr('src', '');
+            });
+            $("#Login").on('show.bs.modal', function () {
+                url = $("#LoginVideo").attr('src');
+                $("#LoginVideo").attr('src', url);
+            });
+
+            $("#AddMembers").on('hide.bs.modal', function () {
+                $("#AddMembersVideo").attr('src', '');
+            });
+            $("#AddMembers").on('show.bs.modal', function () {
+                url = $("#AddMembersVideo").attr('src');
+                $("#AddMembersVideo").attr('src', url);
+
+            $("#AddAccount").on('hide.bs.modal', function () {
+                $("#AddAccountVideo").attr('src', '');
+            });
+            $("#AddAccount").on('show.bs.modal', function () {
+                url = $("#AddAccountVideo").attr('src');
+                $("#AddAccountVideo").attr('src', url);
+
+            $("#Transaction").on('hide.bs.modal', function () {
+                $("#TransactionVideo").attr('src', '');
+            });
+            $("#AddAccount").on('show.bs.modal', function () {
+                url = $("#AddAccountVideo").attr('src');
+                $("#AddAccountVideo").attr('src', url);
+
+            $("#Charts").on('hide.bs.modal', function () {
+                $("#ChartsVideo").attr('src', '');
+            });
+            $("#Charts").on('show.bs.modal', function () {
+                url = $("#ChartsVideo").attr('src');
+                $("#ChartsVideo").attr('src', url);
+
+
+
+           
+
+        });
+
+    </script>
+}
+

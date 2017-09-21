@@ -1,0 +1,55 @@
+﻿@model Budgeter.Models.Household
+
+@{
+    ViewBag.Title = "Delete";
+}
+<div class="col-md-offset-3 col-md-6">
+    <div class="tile">
+
+
+
+        <h1 class="text-danger center">Deleting this household will be permanent!</h1>
+        <h3 class="fontBoxRed center">The budget and all related accounts and tranasctions will aslo be deleted!!</h3>
+
+        <h3 class="text-warning center">Are you sure you still want to delete this household?</h3>
+        <div>
+
+            <hr />
+            <dl class="dl-horizontal">
+                <dt>
+                    @Html.DisplayNameFor(model => model.Name)
+                </dt>
+
+                <dd>
+                    @Html.DisplayFor(model => model.Name)
+                </dd>
+
+                <dt>
+                    @Html.DisplayNameFor(model => model.Created)
+                </dt>
+
+                <dd>
+                    @Html.DisplayFor(model => model.Created)
+                </dd>
+                <dt>Members</dt>
+                <dd>
+                    @foreach (var member in Model.Members)
+                    {
+                        @member.FullName<br />
+                    }
+                </dd>
+
+            </dl>
+
+            @using (Html.BeginForm())
+            {
+                @Html.AntiForgeryToken()
+
+                <div class="form-actions no-color">
+                    <input type="submit" value="Delete" class="btn btn-default" /> |
+                    @Html.ActionLink("Back to Household", "MyHousehold")
+                </div>
+            }
+        </div>
+    </div>
+</div>

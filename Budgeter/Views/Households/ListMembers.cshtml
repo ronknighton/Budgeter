@@ -1,0 +1,142 @@
+﻿@model IEnumerable<Budgeter.Models.ApplicationUser>
+@using Budgeter.Helpers
+
+@{
+    ViewBag.Title = "Index";
+}
+<div class="tile" style="overflow-x: scroll">
+    <h2>Household Members</h2>
+    @Html.ActionLink("Back to Household", "MyHousehold", "Households", null, new { @class = "btn btn-sm m-b-10" })
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.FirstName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.LastName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.FullName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Protected)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.AddBankAccounts)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.EditBudget)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.EditHousehold)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.EditTransactions)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.DisplayImage)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Email)
+                </th>
+                <th>Roles</th>
+                <th>Options</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.FirstName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.LastName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.FullName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Protected)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(model => item.AddBankAccounts)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(model => item.EditBudget)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(model => item.EditHousehold)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(model => item.EditTransactions)
+                    </td>
+                    <td>
+                        @if (item.DisplayImage != null)
+                {
+                            <img class="img-responsive" style="max-height: 50px" src="@item.DisplayImage" />
+                        }
+
+                        @*@Html.DisplayFor(modelItem => item.DisplayImage)*@
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Email)
+                    </td>
+
+                    <td>
+                        @{
+                            var usersHelper = new UsersHelper();
+                        }
+                        @foreach (var role in usersHelper.ListUserRoles(item.Id))
+                {
+                            @role <br />
+                        }
+                    </td>
+                    <td>
+                        @*@Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
+                        @Html.ActionLink("Details", "Details", new { id = item.Id }) |*@
+                        @if (usersHelper.IsCurrentUser(item.Id) || User.IsInRole("Admin"))
+                {
+                            @Html.ActionLink("Profile Changes", "ProfileChanges", "ApplicationUsers", new { userId = item.Id }, new { @class = "btn btn-sm" })<br />
+
+                            if (!item.Protected)
+                            {
+                                @Html.ActionLink("Leave Household", "RemoveMember", new { userId = item.Id }, new { @class = "btn btn-sm" })<br />
+                            }
+                        }
+                        @if ((usersHelper.IsHOH() || User.IsInRole("Admin")) && !item.Protected)
+                {
+
+                            @Html.ActionLink("Change Role", "ChangeRole", "ApplicationUsers", new { userId = item.Id }, new { @class = "btn btn-sm" })<br />
+
+                            if (!usersHelper.IsCurrentUser(item.Id))
+                            {
+                                @Html.ActionLink("Remove", "RemoveMember", new { userId = item.Id }, new { @class = "btn btn-sm" })<br />
+                            }
+
+                        }
+
+                    </td>
+                </tr>
+                            }
+        </tbody>
+    </table>
+</div>
+@section Scripts {
+    <script>
+
+            //$('#scrollTable').DataTable({
+            //    "scrollY": "400px",
+            //    "scrollCollapse": true,
+            //    "paging": false
+            //});
+
+
+         //Jquery Tables
+        $('.table').DataTable();
+        $('.block-area').DataTable();
+    </script>
+    }
+

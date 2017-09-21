@@ -1,0 +1,57 @@
+﻿@model Budgeter.Models.BudgetItem
+@using Budgeter.Helpers
+
+@{
+    ViewBag.Title = "Details";
+    var userHelper = new UsersHelper();
+}
+
+<div class="col-md-offset-4 col-md-4">
+    <h2 class="center">Item Details</h2>
+
+    <div class="center">
+        
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayNameFor(model => model.Budget.Name)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Budget.Name)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Category.Name)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Category.Name)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Name)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Name)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Amount)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Amount)
+            </dd>
+
+        </dl>
+    </div>
+    <p>
+        @if (userHelper.IsHOH())
+        {
+            @Html.ActionLink("Edit", "Edit", new { id = Model.Id })
+        }
+      
+        @Html.ActionLink("Back to List", "Index")
+    </p>
+ </div>

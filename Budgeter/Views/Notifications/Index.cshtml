@@ -1,0 +1,54 @@
+﻿@model IEnumerable<Budgeter.Models.Notification>
+@using Budgeter.Helpers
+@{
+    ViewBag.Title = "Index";
+    var usersHelper = new UsersHelper();
+}
+
+<h2>Your Messages</h2>
+
+<p>
+    @Html.ActionLink("Create New Message", "Create", null, new { @class = "btn btn-lg" })
+</p>
+<table class="table">
+    <thead>
+        <tr>
+
+            <th>
+                @Html.DisplayNameFor(model => model.Message)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Created)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Sender)
+            </th>
+            <th>Options</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+
+                <td>
+                    @Html.Raw(item.Message)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Created)
+                </td>
+                <td>
+                    @usersHelper.GetUserNameFromId(item.Sender)
+
+                    @*@Html.DisplayFor(modelItem => item.Sender)*@
+                </td>
+                <td>
+                    @Html.ActionLink("Read", "Edit", new { id = item.Id }, new { @class = "btn btn-sm" })
+                    @*@Html.ActionLink("Details", "Details", new { id=item.Id }) |*@
+                    @Html.ActionLink("Delete", "Delete", new { id = item.Id }, new { @class = "btn btn-xs", @style = "color: red" })
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

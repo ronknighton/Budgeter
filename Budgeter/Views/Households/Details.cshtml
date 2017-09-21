@@ -1,0 +1,116 @@
+﻿@model Budgeter.Models.Household
+@using Budgeter.Helpers
+
+@{
+    ViewBag.Title = "Details";
+    var usersHelper = new UsersHelper();
+    var householdHelper = new HouseholdsHelper();
+}
+
+<div class="col-md-offset-3 col-md-6">
+    <div class="tile">
+        <h2><img src="~/Assets/images/icon/home@2x.png" /> @Model.Name</h2>
+
+        <div>
+            <h4>Created: <span class="fontBox">@Html.DisplayFor(model => model.Created)</span></h4>
+            <h4>Created By: <span class="fontBox">@householdHelper.GetCreatorName(Model.Id)</span></h4>
+            <hr />
+
+        </div>
+        <div class="row">
+            <div class="col-md-6 p-15">
+
+                <h4 class="center ">Household Options</h4>
+                <div class="col-md-12 tile">
+                   
+                       @*@Html.ActionLink("Create Data (Testing Only)", "CreateData") <br />
+                         @TempData["CreateData"]<br />*@
+
+                    @if (usersHelper.IsHOH() || usersHelper.EditHousehold())
+                    {
+                        @Html.ActionLink("Edit Household Name", "Edit", new
+                   {
+                       id = Model.Id
+                   }) <br />
+                        @Html.ActionLink("Delete Household", "Delete", new { id = Model.Id })
+                    }
+                    else
+                    {
+                        <span>You do not have permission to edit household</span>
+                    }
+                </div>
+
+            </div>
+
+            <div class="col-md-6 p-15">
+
+                <h4 class="center ">Member Options</h4>
+                <div class="col-md-12 tile p-15 mt-10">
+                    @Html.ActionLink("List/Remove Members", "ListMembers", "Households", new { hId = Model.Id }, null) <br />
+                    @if (usersHelper.IsHOH())
+                    {
+                        @Html.ActionLink("Send Invite", "SendInvitation", "Invitations", new { hId = Model.Id }, null) <br />
+                        @Html.ActionLink("Add Member", "AddMember", "Households", new { hId = Model.Id }, null)<br />
+
+                    }
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 p-15">
+
+
+             
+                    <h4 class="center ">Budget Options</h4>
+             
+                <div class="col-md-12 tile p-15 mt-10">
+                    @if (ViewBag.Budget == null)
+                    {
+                        <span>Budget needs to be created!</span><br />
+                    }
+                    @if (ViewBag.Budget != null)
+                    {
+                        @Html.ActionLink("View & Edit Budget", "Details", "Budgets", new { id = ViewBag.Budget.Id }, null)<br />
+
+
+                    }
+                    else if (usersHelper.IsHOH())
+                    {
+                        @Html.ActionLink("Create Budget", "Create", "Budgets")<br />
+                    }
+
+
+                </div>
+
+            </div>
+            <div class="col-md-6 p-15">
+
+                <h4 class="center ">Financial Options</h4>
+                <div class="col-md-12 tile p-15 mt-10">
+                    @if (usersHelper.UserHasEverything())
+                    {
+                        @Html.ActionLink("Transactions", "Index", "Transactions") <br />
+                    }
+                    @if (usersHelper.HaveBankAccount())
+                    {
+                        @Html.ActionLink("Bank Accounts", "Index", "BankAccounts")
+                    }
+                    else
+                    {
+                        <span>Bank Account(s) need to be added!</span><br />
+                        if (usersHelper.AddBankAccounts())
+                        {
+                            @Html.ActionLink("Add Bank Account", "Create", "BankAccounts")
+                        }
+
+                    }
+
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+    @*@Html.ActionLink("Back to List", "Index")*@
+</div>

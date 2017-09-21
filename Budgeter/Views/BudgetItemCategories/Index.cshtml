@@ -1,0 +1,50 @@
+﻿@model IEnumerable<Budgeter.Models.BudgetItemCategory>
+@using Budgeter.Helpers
+@{
+    ViewBag.Title = "Index";
+    var userHelper = new UsersHelper();
+}
+
+<h2>Category Index</h2>
+
+@if (userHelper.IsHOH())
+{
+    <p>
+        @Html.ActionLink("Create New", "Create")
+    </p>
+}
+
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Name)
+        </th>
+        <th>Budget Items</th>
+        <th>Options</th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Name)
+        </td>
+        <td>
+            @foreach(var bi in item.BudgetItems)
+            {
+               @Html.ActionLink(bi.Name, "Details", "BudgetItems", new { id = bi.Id }, null)<br />
+            }
+        </td>
+        <td>
+                        
+            @Html.ActionLink("Details", "Details", new { id=item.Id }) <br />
+            @if (userHelper.IsHOH())
+            {
+                @Html.ActionLink("Edit", "Edit", new { id = item.Id }) <br />
+                @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+            }
+           
+        </td>
+    </tr>
+}
+
+</table>

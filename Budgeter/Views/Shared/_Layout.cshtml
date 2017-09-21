@@ -1,0 +1,529 @@
+﻿@using Microsoft.AspNet.Identity
+@using Budgeter.Helpers
+
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Money Management Software</title>
+    <link rel="icon" type="image/png" href="~/Assets/images/icons/MMSicon.ico" />
+    @*
+        <img src="~/Assets/images/icons/MMSicon.ico" />*@
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+    <meta name="format-detection" content="telephone=no">
+    <meta charset="UTF-8">
+    <meta name="description" content="Money Management Software">
+    <meta name="keywords" content="money management, budget software">
+
+
+
+
+
+    <link href="~/Assets/css/bootstrap.min.css" rel="stylesheet">
+    @*
+        <link href="~/Assets/css/animate.min.css" rel="stylesheet">*@
+    <link href="~/Assets/css/font-awesome.min.css" rel="stylesheet">
+    @*
+        <link href="~/Assets/css/form.css" rel="stylesheet">*@
+    <link href="~/Assets/css/calendar.css" rel="stylesheet">
+   
+    <link href="~/Assets/css/icons.css" rel="stylesheet">
+    <link href="~/Assets/css/generics.css" rel="stylesheet">
+    <link href="~/Assets/css/bootstrap-multiselect.css" rel="stylesheet" />
+    <link href="~/Assets/css/dataTables.bootstrap.css" rel="stylesheet" />
+    <link href="~/Assets/css/style-admin.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/6.6.6/sweetalert2.min.css" rel="stylesheet" />
+    @RenderSection("styles", required: false)
+
+</head>
+<body id="skin-cloth">
+    <header id="header" class="media">
+        <a href="" id="menu-toggle"></a>
+        @*<a class="logo pull-left" href="index.html">Error Management</a>*@
+        @Html.ActionLink("MMS Home", "Index", "Home", new { area = "" }, new { @class = "logo pull-left" })
+        @{
+            var notificationsHelper = new NotificationsHelper();
+            var stringHelper = new StringHelpers();
+            var usersHelper = new UsersHelper();
+            var accountHelper = new AccountsHelper();
+            var budgetItemsHelper = new BudgetItemsHelper();
+            var budgetHelper = new BudgetsHelper();
+            var householdHelper = new HouseholdsHelper();
+        }
+        <div class="media-body">
+            <div class="media" id="top-menu">
+                @if (Request.IsAuthenticated)
+                {
+                    <div class="pull-left tm-icon">
+                        <a data-drawer="messages" class="drawer-toggle" href="">
+                            <i class="sa-top-message"></i>
+                            <i class="n-count animated">@notificationsHelper.GetUserNotificationsCount()</i><!--Change this image-->
+                            <span>Notifications</span>
+                        </a>
+                    </div>
+                    @*<div class="pull-left tm-icon">
+                            <a data-drawer="notifications" class="drawer-toggle" href="">
+                                <i class="sa-top-updates"></i>
+                                <i class="n-count animated">@notificationsHelper.GetUserNotificationsCount()</i>
+                                <span>Histories</span>
+                            </a>
+                        </div>*@
+                }
+                <div id="time" class="pull-right">
+                    <span id="hours"></span>
+                    :
+                    <span id="min"></span>
+                    :
+                    <span id="sec"></span>
+                </div>
+
+                @*<div class="media-body">
+                        <input type="text" class="main-search">
+                    </div>*@
+            </div>
+        </div>
+    </header>
+    <!--Start MVC Header-->
+    <!--End MVC Header-->
+    <!--Cut from index and put in layout Below-->
+    <div class="clearfix"></div>
+
+    <section id="main" class="p-relative" role="main">
+
+        <!-- Sidebar -->
+        <aside id="sidebar">
+
+            <!-- Sidbar Widgets -->
+            <div class="side-widgets overflow">
+                <!-- Profile Menu -->
+
+                <div class="text-center s-widget m-b-25 dropdown" id="profile-menu">
+                    @*<a href="" data-toggle="dropdown">
+                    *@
+
+                    <img src="@usersHelper.UserProfileImage()" class="profile-pic animated" alt="">
+
+
+                    @if (Request.IsAuthenticated)
+                    {
+                        <h5 class="m-0">@Html.ActionLink("Hello " + usersHelper.GetUserNameFromId(User.Identity.GetUserId()), "Index", "Manage", routeValues: null, htmlAttributes: new { title = "Manage" })</h5>
+                    }
+                    else
+                    {
+                        <h4>Not Logged In</h4>
+                    }
+                </div>
+
+                <!-- Calendar -->
+                <div class="s-widget m-b-25">
+                    <div id="sidebar-calendar"></div>
+                </div>
+                <!--Bank Accounts-->
+                <div class="s-widget m-b-25">
+                    <h2 class="tile-title">Bank Accounts</h2>
+                    <div class="col-md-12">
+                        @foreach (var a in accountHelper.GetAccountsIdList())
+                        {
+                            <div class="row">
+                                <div class="col-md-7"><small>@accountHelper.GetAccountName(a)</small></div>
+
+                                <div class="col-md-5"><small>$@accountHelper.GetAccountBalance(a)<br /></small></div>
+                            </div>
+                        }
+                    </div>
+                </div>
+                <!-- Projects -->
+
+                <div class="s-widget m-b-25">
+                    <h2 class="tile-title">@budgetItemsHelper.GetMonth() Budgets <br /> Target: $@budgetHelper.GetBudgetAmount() <br />Spent: $@budgetHelper.GetBudgetSpent() </h2>
+                    
+                    <div class="col-md-12">
+                        <div class="text-center">Item - Budget/Spent</div>
+
+                        <!--SideBar Slide meters-->
+                        @{
+                            var itemIds = budgetItemsHelper.GetBudgetItems();
+                            var totalSpent = 0.00M;
+                        }
+                        <div class="s-widget-body">
+                            @foreach (var item in itemIds)
+                            {
+                               
+                                var percent = budgetItemsHelper.GetItemPercentage(item);
+                                var color = budgetItemsHelper.GetBarColor(percent);
+                                var displayValue = (percent > 200) ? ">200" : percent.ToString();
+                                var percentValue = (percent > 100) ? 100 : percent;
+                                var spentAmount = budgetItemsHelper.GetSpentAmount(item);
+                                totalSpent += spentAmount;
+                                <div class="side-border">
+
+                                    <small>@budgetItemsHelper.getBudgetItemName(item) - $@budgetItemsHelper.GetBudgetAmount(item)/$@spentAmount</small>
+
+                                    <div class="progress progress-small">
+                                        <a href="#" data-toggle="tooltip" title="" class="progress-bar tooltips @color" style="width: @percentValue%;" data-original-title=@displayValue %>
+                                            <span class="sr-only">@percentValue% Complete</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            }
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Side Menu -->
+            <ul class="list-unstyled side-menu">
+
+                @if (User.Identity.IsAuthenticated)
+                {
+                    if (usersHelper.HaveHousehold())
+                    {
+                        <li>
+                            <a class="sa-side-home" href="@Url.Action("MyHousehold", "Households" )">
+                                <span class="menu-item">My Household</span>
+                            </a>
+                        </li>
+                        if (usersHelper.HaveBudget())
+                        {
+                            <li>
+                                <a class="sa-side-table" href="@Url.Action("Details", "Budgets" , new {id=budgetHelper.GetBudgetId() })">
+                                    <span class="menu-item">Budget Options</span>
+                                </a>
+                            </li>
+
+                        }
+                        if (usersHelper.UserHasEverything())
+                        {
+                            <li>
+                                <a class="sa-side-typography" href="@Url.Action("Index", "Transactions" )">
+                                    <span class="menu-item">Transactions</span>
+                                </a>
+                            </li>
+                        }
+
+                        if (usersHelper.HaveBankAccount())
+                        {
+                            <li>
+                                <a class="sa-side-page" href="@Url.Action("UserIndex", "BankAccounts" )">
+                                    <span class="menu-item">Bank Accounts</span>
+                                </a>
+                            </li>
+                        }
+                        if (usersHelper.UserHasEverything())
+                        {
+                            <li>
+                                <a class="sa-side-chart" href="@Url.Action("ShowCharts", "Transactions" )">
+                                    <span class="menu-item">Charts and Graphs</span>
+                                </a>
+                            </li>
+                        }
+
+
+
+@*
+    <li>
+        <a class="sa-side-folder" href="@Url.Action("Index", "ApplicationUsers" )">
+            <span class="menu-item">Users</span>
+        </a>
+    </li>
+
+            <li>
+                <a class="sa-side-form" href="@Url.Action(" UserIndex", "TicketComments" )">
+                    <span class="menu-item">My Ticket Comments</span>
+                </a>
+            </li>
+            <li>
+                <a class="sa-side-table" href="@Url.Action(" UserIndex", "TicketAttachments" )">
+                    <span class="menu-item">My Ticket Attachments</span>
+                </a>
+            </li>
+            <li>
+                <a class="sa-side-folder" href="@Url.Action(" UserIndex", "TicketNotifications" )">
+                    <span class="menu-item">My Ticket Notifications</span>
+                </a>
+            </li>
+            <li>
+                <a class="sa-side-chart" href="@Url.Action(" UserIndex", "TicketHistories" )">
+                    <span class="menu-item">My Ticket Histories</span>
+                </a>
+            </li>
+
+
+
+            <li>
+                <a class="sa-side-page" href="@Url.Action(" Index", "Projects" )">
+                    <span class="menu-item">All Projects</span>
+                </a>
+            </li>
+
+
+
+            <li>
+                <a class="sa-side-typography" href="@Url.Action(" Index", "Tickets" )">
+                    <span class="menu-item">All Tickets</span>
+                </a>
+            </li>
+            <li>
+                <a class="sa-side-table" href="@Url.Action(" Index", "TicketAttachments" )">
+                    <span class="menu-item">All Ticket Attachments</span>
+                </a>
+            </li>
+            <li>
+                <a class="sa-side-form" href="@Url.Action(" Index", "TicketComments" )">
+                    <span class="menu-item">All Ticket Comments</span>
+                </a>
+            </li>
+            <li>
+                <a class="sa-side-photos" href="@Url.Action(" Index", "TicketNotifications" )">
+                    <span class="menu-item">All Ticket Notifications</span>
+                </a>
+
+            </li>
+            <li>
+                <a class="sa-side-chart" href="@Url.Action(" Index", "TicketHistories" )">
+                    <span class="menu-item">All Ticket Histories</span>
+                </a>
+            </li>
+
+            <li>
+                <a class="sa-side-ui" href="@Url.Action(" Index", "ApplicationUsers" )">
+                    <span class="menu-item">Available Users</span>
+                </a>
+            </li>*@
+                            @*
+                                <li>
+                                    <a class="sa-side-calendar" href="@Url.Action(" Calendar", "Home" )">
+                                        <span class="menu-item">Calendar</span>
+                                    </a>
+                                </li>
+                                }*@
+
+                    }
+                }
+            </ul>
+
+        </aside>
+        <section id="content" class="container">
+
+            <!-- Notifications Drawer- Put In Layout?? -->
+            @{
+                //var ticketsHelper = new N();
+
+                //var notifications = ticketsHelper.UserTicketNotifications();
+            }
+
+            <div id="messages" class="tile drawer animated">
+                <div class="listview narrow">
+                    <div class="media">
+
+                        <a href="@Url.Action("Create", "Notifications" )">Send a New Message</a><span> | </span><a href="@Url.Action("UserIndex", "Notifications" )">VIEW ALL</a>
+                        <span class="drawer-close">&times;</span>
+
+                    </div>
+                    @{ var count = 0;}
+                    <div class="overflow" style="height: 254px">
+                        @foreach (var notification in @notificationsHelper.GetUserNotifications().Take(5))
+                        {
+                            count++;
+                            <div class="media">
+                                <div class="pull-left">
+                                    <img height="40" src=@usersHelper.getUserDisplayImage(notification.Sender) />
+                                </div>
+                                <div class="media-body">
+                                    <small class="text-muted">
+                                        From: @usersHelper.GetUserNameFromId(notification.Sender) - @notification.Created - @if (!notification.Read)
+                                        {<b class="text-danger">Not Read</b>}
+
+                                    </small><br>
+                                    <a class="t-overflow" href="@Url.Action("Edit", "Notifications" , new { id=notification.Id })">@StringHelpers.ShortString(notification.Message)</a>
+                                </div>
+                            </div>
+                        }
+                        @if(count <= 0)
+                        {
+                            <h3>You have no unread messages. Click <a href="@Url.Action("UserIndex", "Notifications" )">VIEW ALL</a> to see all of your messages.</h3>
+                        }
+                    </div>
+
+                    <div class="media text-center whiter l-100">
+                        <a href="@Url.Action("UserIndex", "Notifications" )"><small>VIEW ALL</small></a>
+                    </div>
+                </div>
+            </div><!--End Notifications-->
+            <!--Histories drawer-->
+            <div id="notifications" class="tile drawer animated">
+                <div class="listview narrow">
+                    @*<div class="media">
+                            <a href="@Url.Action("Create", "TicketNotifications" )">Send a New Message</a>
+                            <span class="drawer-close">&times;</span>
+
+                        </div>*@
+                    @*<div class="overflow" style="height: 254px">
+                            @foreach (var history in ticketsHelper.GetUserTicketHistories())
+                            {
+                            <div class="media">
+                                <div class="pull-left">
+                                    <img width="40" src=~/Assets/images/profile-pics/einstein.jpg alt="">
+                                </div>
+                                <div class="media-body">
+                                    <small class="text-muted">@history.Ticket.Title - @history.DateChanged - @history.Property</small><br>
+                                    <a class="t-overflow" href="@Url.Action(" Details", "TicketHistories" , new {id=history.Id })">See Details</a>
+                                </div>
+                            </div>
+                            }
+
+                        </div>*@
+                    @*<div class="media text-center whiter l-100">
+                            <a href="@Url.Action("UserIndex", "TicketHistories" )"><small>VIEW ALL</small></a>
+                        </div>*@
+                </div>
+            </div>
+
+            <!--End Extra Notifications drawer???-->
+            <!-- Breadcrumb -->
+            <ol class="breadcrumb hidden-xs">
+
+
+
+                @if (User.IsInRole("Admin"))
+                {
+                    <li>@Html.ActionLink("Households", "Index", "Households")</li>
+                    <li>@Html.ActionLink("Users", "Index", "ApplicationUsers")</li>
+                }
+
+                @if (Request.IsAuthenticated)
+                {
+
+                    if (!usersHelper.HaveHousehold())
+                    {
+                        <li>@Html.ActionLink("Create Household", "Create", "Households")</li>
+                    }
+
+                    using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <li><a href="javascript:document.getElementById('logoutForm').submit()"><strong> Log off</strong></a></li>
+
+                    }
+                }
+                else
+                {
+
+                    <li>@Html.ActionLink("Register", "Register", "Account", routeValues: null, htmlAttributes: new { id = "registerLink" })</li>
+                    <li>@Html.ActionLink("Log in", "Login", "Account", routeValues: null, htmlAttributes: new { id = "loginLink" })</li>
+
+                }
+            </ol>
+            <h4 class="page-title">@householdHelper.GetHouseholdName()</h4>
+            <!--Cut from index and put in layout Above-->
+            <div class="p-10"></div>
+            <div class="col-md-12">
+                @RenderBody()
+            </div>
+        </section>
+    </section>
+    <!-- Modal -->
+    <div class="modal fade" id="DBmodal" role="dialog">
+        <div class="modal-dialog modal-md custom-modal">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h2 class="modal-title">Auto-Generate Data</h2>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <p>
+                                This feature allows for the creation of automatically generated data to populate the database.
+                                This will be 10 projects, with 10 tickets each. Each ticket will have 10 comments and 10 attachments each. This will
+                                give the user ample data to view and manipualte to become familiar with the application and its functionality.
+                                Each time this function is implemented, the old data will be cleared, and new created.
+                            </p>
+                            <p>This process can take a few seconds, so please be patient.</p>
+                            <h4 class="text-danger">You will get a pop-up notification when the process completes.</h4>
+                            @Html.ActionLink("Create New Table Data", "CreateTableData", "Projects", null, new { title = "Auto-Generates New Table Data in DB" })
+
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+
+    @*@Scripts.Render("~/bundles/jquery")*@
+    @*@Scripts.Render("~/bundles/bootstrap")*@
+
+    <!--Admin Dashboard stuff-->
+    <script src="~/Assets/js/jquery.min.js"></script>
+    <script src="~/Assets/js/jquery-ui.min.js"></script> <!-- jQuery UI -->
+    <script src="~/Assets/js/jquery.easing.1.3.js"></script> <!-- jQuery Easing - Requirred for Lightbox + Pie Charts-->
+    <!-- Bootstrap -->
+    <script src="~/Assets/js/bootstrap.min.js"></script>
+    <!-- Charts -->
+    <script src="~/Assets/js/charts/jquery.flot.js"></script> <!-- Flot Main -->
+    <script src="~/Assets/js/charts/jquery.flot.time.js"></script> <!-- Flot sub -->
+    <script src="~/Assets/js/charts/jquery.flot.animator.min.js"></script> <!-- Flot sub -->
+    <script src="~/Assets/js/charts/jquery.flot.resize.min.js"></script> <!-- Flot sub - for repaint when resizing the screen -->
+    <script src="~/Assets/js/sparkline.min.js"></script> <!-- Sparkline - Tiny charts -->
+    <script src="~/Assets/js/easypiechart.js"></script> <!-- EasyPieChart - Animated Pie Charts -->
+    <script src="~/Assets/js/charts.js"></script> <!-- All the above chart related functions -->
+    <!--  Form Related -->
+    <script src="~/Assets/js/icheck.js"></script>  @*Custom Checkbox + Radio*@
+    <!-- UX -->
+    <script src="~/Assets/js/scroll.min.js"></script> <!-- Custom Scrollbar -->
+    <!-- Other -->
+    <script src="~/Assets/js/calendar.min.js"></script> <!-- Calendar -->
+  
+    <!--JQuery Datatables-->
+    <script src="~/Scripts/jquery.dataTables.min.js"></script>
+    
+    <script src="~/Assets/js/functions.js"></script>
+    <script src="~/Assets/js/bootstrap-multiselect.js"></script>
+    <script src="~/Assets/js/BudgeterJS.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/6.6.6/sweetalert2.min.js"></script>
+
+    <script>
+
+        @*//Jquery Tables
+        $('.table').DataTable();
+        $('.block-area').DataTable();
+
+        // Sweet Alert Pop-up
+        $(window).on('load', function () {
+            if ('@TempData["AlertMessage"]') {
+                swal('@TempData["AlertMessage"]')
+            }
+        });*@
+
+        //$(document).ready(function () {
+        //    $('.table').DataTable({
+        //        "scrollY": "400px",
+        //        "scrollCollapse": true,
+        //        "paging": false
+        //    });
+        //});
+
+     
+
+
+    </script>
+    <!-- All JS functions -->
+    @*
+        <script src="~/Assets/js/functions.js"></script>*@
+
+    @RenderSection("scripts", required: false)
+
+
+
+</body>
+</html>

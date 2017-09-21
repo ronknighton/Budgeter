@@ -1,0 +1,31 @@
+﻿@using Budgeter.Helpers
+@{
+    ViewBag.Title = "ViewTransactionAlert";
+    var accountHelper = new AccountsHelper();
+}
+
+
+<div class="col-md-offset-4 col-md-4">
+    <div class="tile">
+        <h2 class="center">Transaction Alert</h2>
+
+        @if (ViewBag.BankAccount != null)
+        {
+            <div class="center">
+                <h3 class="fontBox">Account Details</h3>
+                <label>Account Name: </label><span>  @ViewBag.BankAccount.Name</span><br />
+                <label>Account Balance: </label><span>  $@accountHelper.GetAccountBalance(ViewBag.BankAccount.Id)</span><br />
+                <h3 class="fontBox">Transaction Details</h3>
+                <label>Transaction Description: </label><span>  @ViewBag.Transaction.Description</span><br />
+                <label>Transaction Amount: </label><span>  @ViewBag.Transaction.Amount</span><br />
+                <label>Transcation Date: </label><span>  @ViewBag.Transaction.Created.ToString("g")</span><br />
+            @Html.ActionLink("Edit Transaction", "Edit", new { id = @ViewBag.Transaction.Id }, new { @class = "btn btn-info btn-sm" })
+        </div>
+        }
+        else
+        {
+            <h5 class="fontBoxRed center">It appears this transcation has been deleted.</h5>
+        }
+    </div>
+</div>
+

@@ -1,0 +1,75 @@
+﻿<link href="~/Assets/css/dataTables.bootstrap.css" rel="stylesheet" />
+
+@model IEnumerable<Budgeter.Models.BudgetItem>
+@using Budgeter.Helpers
+@{
+    ViewBag.Title = "Index";
+    var userHelper = new UsersHelper();
+}
+
+  <div class="center">
+    <label class="fontOutline">Budget Items</label>
+</div>
+
+
+    <table class="table" id="scrollBI">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Name)
+                </th>
+                <th>
+                    @Html.DisplayName("Category")
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Amount)
+                </th>
+                <th>Options</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+
+
+
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Category.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Amount)
+                    </td>
+
+                    <td>
+
+
+                        @if (userHelper.IsHOH() || userHelper.EditBudget())
+                        {
+                            @Html.ActionLink("Edit", "Edit", new { id = item.Id }, new { @class = "btn btn-sm" }) <br />
+                            @Html.ActionLink("Delete", "Delete", new { id = item.Id }, new { @class = "btn btn-sm" })
+                        }
+
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+<script src="~/Scripts/jquery-1.12.4.js"></script>
+<script src="~/Scripts/jquery.dataTables.min.js"></script>
+<script>
+  
+
+    $(document).ready(function () {
+    $('#scrollBI').DataTable({
+    "scrollY": "500px",
+    "scrollCollapse": true,
+    "paging": false
+    });
+    })
+
+</script>

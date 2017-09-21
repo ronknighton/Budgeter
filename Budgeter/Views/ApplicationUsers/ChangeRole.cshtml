@@ -1,0 +1,105 @@
+﻿@model Budgeter.Models.ApplicationUser
+
+@{
+    ViewBag.Title = "Details";
+}
+<div class="col-md-offset-4 col-md-4">
+    <div class="row">
+        <div class="col-md-2">
+            @if (Model.DisplayImage != null)
+            {
+                <img style="max-height:80px" class="img-responsive" src="@Model.DisplayImage" />
+            }
+        </div>
+        <div class="col-md-10">
+            <h2>@Model.FullName</h2>
+            <h4>@Model.Email</h4>
+        </div>
+    </div>
+
+    <div>
+
+        <hr />
+        <dl class="dl-horizontal">
+
+            <dt>
+                @Html.DisplayNameFor(model => model.FirstName)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.FirstName)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.LastName)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.LastName)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Protected)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Protected)
+            </dd>
+         
+
+        </dl>
+    </div>
+    <h3 class="center">Make Privelege Changes</h3>
+    <hr />
+    @using (Html.BeginForm())
+    {
+        @*@Html.AntiForgeryToken()*@
+
+        <div class="form-horizontal">
+            <div class="form-group p-15">
+                @Html.Label("Member Role", htmlAttributes: new { @class = "control-label col-md-4" })
+                <div class="col-md-6">
+                    @Html.DropDownList("userRoles", null, htmlAttributes: new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.HouseholdId, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+        <dl class="dl-horizontal">
+            <dt>@Html.LabelFor(model => model.EditBudget)</dt>
+            <dd>                
+                    @Html.EditorFor(model => model.EditBudget, new { @class = "checkbox" })
+                    @Html.ValidationMessageFor(model => model.EditBudget, "", new { @class = "text-danger" })               
+            </dd>
+            <dt>@Html.LabelFor(model => model.AddBankAccounts)</dt>
+            <dd>              
+                    @Html.EditorFor(model => model.AddBankAccounts, new { @class = "checkbox" })
+                    @Html.ValidationMessageFor(model => model.AddBankAccounts, "", new { @class = "text-danger" })               
+            </dd>
+            <dt>
+                @Html.LabelFor(model => model.EditHousehold)
+            </dt>
+            <dd>
+                    @Html.EditorFor(model => model.EditHousehold, new { @class = "checkbox" })
+                    @Html.ValidationMessageFor(model => model.EditHousehold, "", new { @class = "text-danger" })               
+            </dd>
+            <dt>
+                @Html.LabelFor(model => model.EditTransactions)
+            </dt>
+            <dd>
+                    @Html.EditorFor(model => model.EditTransactions, new { @class = "checkbox" })
+                    @Html.ValidationMessageFor(model => model.EditTransactions, "", new { @class = "text-danger" })           
+            </dd>
+
+        </dl>
+            <div class="row">
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Save Change" class="btn btn-default" />
+                    </div>
+                </div>
+            </div>
+    }
+    <p class="p-15">
+        @*@Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |*@
+        @Html.ActionLink("Back to Members List", "ListMembers", "Households", new { hId = Model.HouseholdId }, null)
+    </p>
+</div>

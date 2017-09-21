@@ -1,0 +1,80 @@
+﻿<link href="~/Assets/css/dataTables.bootstrap.css" rel="stylesheet" />
+
+@model IEnumerable<Budgeter.Models.BudgetItemCategory>
+@using Budgeter.Helpers
+@{
+    ViewBag.Title = "Index";
+    var userHelper = new UsersHelper();
+}
+
+
+
+
+    <div class="center">
+    <label class="fontOutline">Budget Categories</label>
+</div>
+
+<table class="table" id="scrollCI">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>Budget<br />Items</th>
+            <th> Category Total</th>
+            <th>Options</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+            {
+            <tr>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    <div>
+
+                        @foreach (var bi in item.BudgetItems.Where(b => b.Active && b.BudgetId == item.BudgetId))
+                {
+                            @bi.Name <br />
+                        }
+                    </div>
+                </td>
+                <td>
+                    $@item.BudgetItems.Where(i => i.Active && i.BudgetId == item.BudgetId).Select(i => i.Amount).ToList().Sum()
+                </td>
+                <td>
+
+
+                    @if (userHelper.IsHOH() || userHelper.EditBudget())
+                    {
+                        @Html.ActionLink("Edit", "Edit", new { id = item.Id }, new { @class = "btn btn-sm" }) <br />
+                        @Html.ActionLink("Delete", "Delete", new { id = item.Id }, new { @class = "btn btn-sm" })
+                    }
+
+                </td>
+
+            </tr>
+
+        }
+    </tbody>
+
+    </table>
+
+
+<script src="~/Scripts/jquery-1.12.4.js"></script>
+<script src="~/Scripts/jquery.dataTables.min.js"></script>
+<script>
+
+
+    $(document).ready(function () {
+    $('#scrollCI').DataTable({
+    "scrollY": "500px",
+    "scrollCollapse": true,
+    "paging": false
+    });
+    })
+
+</script>

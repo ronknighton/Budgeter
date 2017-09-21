@@ -1,0 +1,42 @@
+﻿@model Budgeter.Models.SendInviteViewModel
+@{
+    ViewBag.Title = "Send an invitation to join your household.";
+}
+<div class="col-md-offset-3 col-md-6">
+    <div class="tile">
+        <h2 class="center">Send invite to @ViewBag.HouseholdName</h2>
+        
+            @using (Html.BeginForm("SendInvitation", "Invitations", new { HouseholdId = ViewBag.HouseholdId }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+            {
+                @Html.AntiForgeryToken()
+
+             
+
+                <h3>@TempData["error"]</h3>
+
+                @Html.ValidationSummary("", new { @class = "text-danger" })
+                <div class="form-group">
+                    @Html.Label("Enter Email", new { @class = "col-md-2 control-label" })
+                    <div class="col-md-8">
+                        @Html.TextBoxFor(model => model.Email, new { @class = "form-control" })
+                    </div>
+                </div>
+                @*<div class="form-group">
+                        @Html.LabelFor(model => model.HouseholdId, "HouseholdId", htmlAttributes: new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            @Html.DropDownList("HouseholdId", null, htmlAttributes: new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.HouseholdId, "", new { @class = "text-danger" })
+                        </div>
+                    </div>*@
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" class="btn btn-default" value="Send Invite" />
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

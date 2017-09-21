@@ -1,0 +1,39 @@
+﻿
+@model Budgeter.Models.BudgetItemCategory
+
+@{
+    ViewBag.Title = "Create";
+}
+
+
+<div class="center">
+    <label class="fontOutline">CREATE CATEGORY</label>
+</div>
+
+@using (Html.BeginForm("Create", "BudgetItemCategories", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+
+    <table class="table">
+        <tr>
+            <th>@Html.LabelFor(model => model.Name)</th>
+            <th>Create</th>
+        </tr>
+        <tr>
+            <td>
+                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+            </td>
+            <td>
+                <input type="submit" value="Create" class="btn btn-default" />
+            </td>
+        </tr>
+    </table>
+            
+}
+
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

@@ -1,0 +1,252 @@
+﻿@model IEnumerable<Budgeter.Models.Transaction>
+@using Budgeter.Helpers
+
+@{
+    ViewBag.Title = "Index";
+    var accountsHelper = new AccountsHelper();
+    var usersHelper = new UsersHelper();
+}
+
+<div class="col-md-12">
+    <div class="tile">
+        <div class="center">
+            <label class="fontOutline">BANK ACCOUNTS</label><br />
+            @if (usersHelper.AddBankAccounts())
+            {
+                @Html.ActionLink("Add Bank Account", "Create", "BankAccounts", null, new { @class = "btn btn-xs center", @style="max-width: 130px"})
+            }
+        </div>
+        <hr />
+        <div class="row">
+            @foreach (var item in accountsHelper.GetAccountsIdList())
+            {
+               
+                    <div class="col-md-3">
+                        <div class="tile">
+                            <label>@accountsHelper.GetAccountName(item) has $@accountsHelper.GetAccountBalance(item)</label><br />                           
+                            @Html.Raw(accountsHelper.OverdraftMonitor(item))
+                        </div>
+                    </div>
+              
+            }
+        </div>
+        </div>
+        <div class="tile" style="overflow:auto">
+
+        @if (ViewBag.Create != null && ViewBag.Create)
+        {
+            { Html.RenderAction("_PartialCreateTransaction", "Transactions", null); }
+        }
+
+
+
+        @{ Html.RenderAction("_PartialEditTransaction", "Transactions", new { id = ViewBag.Id }); }
+   
+            </div>
+    <div class="tile">
+        <div class="center">
+            <label class="fontOutline">TRANSACTIONS LIST</label>
+        </div>
+        
+        <div class="row m-b-15">
+            <div class="col-md-12">
+                <div class="col-md-2">
+                    @using (Html.BeginForm("SearchTransactions", "Transactions", FormMethod.Get))
+            {
+                        <div class="col-md-12">
+                            <label>Search by Budget Item: </label>
+                        </div>
+                        <div class="col-md-9">
+                            @Html.DropDownList("budgetItems", null, "", new { @class = "form-control" })
+                        </div>
+                        <div class="col-md-3">
+                            <input type="submit" value="Go" class="btn btn-default" />
+                        </div>
+                    }
+                </div>
+                <div class="col-md-2">
+                    @using (Html.BeginForm("SearchTransactions", "Transactions", FormMethod.Get))
+            {
+                        <div class="col-md-12">
+                            <label>Search by Category: </label>
+                        </div>
+                        <div class="col-md-9">
+                            @Html.DropDownList("Categories", null, "", new { @class = "form-control" })
+                        </div>
+                        <div class="col-md-3">
+                            <input type="submit" value="Go" class="btn btn-default" />
+                        </div>
+
+                    }
+                </div>
+                <div class="col-md-2">
+                    @using (Html.BeginForm("SearchTransactions", "Transactions", FormMethod.Get))
+            {
+                        <div class="col-md-12">
+                            <label>Search by Inc/Exp: </label>
+                        </div>
+                        <div class="col-md-9">
+                            @Html.DropDownList("IncomeExpense", null, "", new { @class = "form-control" })
+                        </div>
+                        <div class="col-md-3">
+                            <input type="submit" value="Go" class="btn btn-default" />
+                        </div>
+
+                    }
+                </div>
+                <div class="col-md-2">
+                    @using (Html.BeginForm("SearchTransactions", "Transactions", FormMethod.Get))
+            {
+                        <div class="col-md-12">
+                            <label>Search by Date Ranges: </label>
+                        </div>
+                        <div class="col-md-9">
+                            @Html.DropDownList("Dates", null, "", new { @class = "form-control" })
+                        </div>
+                        <div class="col-md-3">
+                            <input type="submit" value="Go" class="btn btn-default" />
+                        </div>
+
+                    }
+                </div>
+
+                <div class="col-md-4">
+                    @using (Html.BeginForm("SearchTransactions", "Transactions", FormMethod.Get))
+            {
+                        <div class="col-md-12">
+                            <label>Search by Bank Account: </label>
+                        </div>
+                        <div class="col-md-8">
+                            @Html.DropDownList("BankAccounts", null, "", new { @class = "form-control" })
+                        </div>
+                        <div class="col-md-2">
+                            <input type="submit" value="Go" class="btn btn-default" />
+                        </div>
+                        <div class="col-md-2">
+                            @Html.ActionLink("CLEAR", "Index", "Transactions", null, new { @class = "btn btn-sm", @style="color:red" })
+
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!--Scrollable JQuery Table-->
+        <table class="table" id="scrollTable">  
+            <thead>       
+                <tr>
+                    <th>
+                        #
+                    </th>
+                    <th>
+                        @Html.DisplayName("Date")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Bank Account Name")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Budget Item")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Entered By")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Income or Expense")
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Description)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Amount)
+                    </th>
+                    <th>
+                        @Html.DisplayName("Rec")
+                    </th>
+                    <th>
+                        Reconciled<br />Amount
+                    </th>
+                    <th>Options</th>
+                </tr> 
+                </thead>
+            <tbody>     
+                @{ var count = 0;}
+                @foreach (var item in Model)
+            {
+                    count++;
+                    <tr>
+                        <td>@count</td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Created)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.BankAccount.Name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.BudgetItem.Name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.EnteredBy.FirstName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.IncomeExpense.Type)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Description)
+                        </td>
+                        <td>
+                            $@Html.DisplayFor(modelItem => item.Amount)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Reconciled)
+                        </td>
+                        <td>
+                           $@Html.DisplayFor(modelItem => item.ReconciledAmount)
+                        </td>
+                        <td>
+                            @if (usersHelper.IsHOH() || usersHelper.EditTransactions())
+                            {
+                                @Html.ActionLink("Edit", "Edit", new { id = item.Id }, new { @class = "btn btn-sm" }) <br />
+                                @Html.ActionLink("Delete", "Delete", new { id = item.Id }, new { @class = "btn btn-sm" }) <br />
+                            }
+                            @*@Html.ActionLink("Details", "Details", new { id = item.Id })*@
+                            
+                            @Html.ActionLink("Send Note", "TransactionNotification", new { id = item.Id }, new { @class = "btn btn-sm" })
+                           
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+    </div>
+</div>
+@*<audio controls="controls">
+    <source src="~/Assets/Sounds/16445_1460642689.mp3" type="audio/mpeg" />
+</audio>*@
+<audio id="audio" src="~/Assets/Sounds/16445_1460642689.mp3" ></audio>
+@section Scripts {
+    <script>
+       
+            $('#scrollTable').DataTable({
+                "scrollY": "600px",
+                "scrollCollapse": true,
+                "paging": true
+            });
+        
+            $('#create').click(function () {
+                var audio = document.getElementById("audio");
+
+                audio.play();
+            });
+
+            $('#edit').click(function () {
+                var audio = document.getElementById("audio");
+
+                audio.play();
+            });
+
+         //Jquery Tables
+        //$('#scrollTable').DataTable();
+        //$('.block-area').DataTable();
+    </script>
+   
+}

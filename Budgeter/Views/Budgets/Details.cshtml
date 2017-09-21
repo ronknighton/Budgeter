@@ -1,0 +1,97 @@
+﻿@model Budgeter.Models.Budget
+@using Budgeter.Helpers
+@{
+    ViewBag.Title = "Details";
+    var userHelper = new UsersHelper();
+}
+
+
+<div class="col-md-12">
+    <div class="tile" style="overflow:auto">
+        <div class="center">
+            <label  class="fontOutline">Budget Details</label>
+        </div>
+
+        <table class="table">
+            <tr>
+                <th>@Html.DisplayName("Budget")</th>
+                <th>@Html.DisplayNameFor(model => model.Created)</th>
+                <th>@Html.DisplayNameFor(model => model.Amount)</th>
+                <th>Budget Items Total</th>
+                <th>Difference</th>
+                <th>Budget Options</th>
+            </tr>
+            <tr>
+                <td>@Html.DisplayFor(model => model.Name)</td>
+                <td>@Html.DisplayFor(model => model.Created)</td>
+                <td>$@Html.DisplayFor(model => model.Amount)</td>
+                <td>
+                    @{
+                    var itemTotal = Model.BudgetItems.Where(i => i.Active).Select(i => i.Amount).Sum();
+                    var difference = Model.Amount - itemTotal;
+                }
+                $@itemTotal
+            </td>
+            <td>
+                @if (difference < 0)
+            {
+                <span class="text-danger">$@difference</span>
+            }
+            else
+            {
+                <span class="text-success">$@difference</span>
+            }
+            @if (difference < 0)
+            {
+                <h5 class="text-danger">You should increase your budget amount or reduce your budget items amount. </h5>
+            }
+        </td>
+        <td>
+            
+
+            @if (userHelper.IsHOH() || userHelper.EditBudget())
+            {
+            @Html.ActionLink("Edit", "Edit", new { id = Model.Id }, new { @class = "btn btn-sm" })
+        }
+
+
+        @Html.ActionLink("Back to Household", "MyHousehold", "Households", null, new { @class = "btn btn-sm" })
+    </td>
+</tr>
+</table>
+
+</div>
+</div>
+<div class="col-md-6">
+    <div class="tile" style="overflow:auto">
+
+        @if (userHelper.IsHOH() || userHelper.EditBudget())
+        {
+            if (ViewBag.EditCategoryId == null)
+            {
+                { Html.RenderAction("_PartialCreateCategory", "BudgetItemCategories", null); }
+            }
+
+            { Html.RenderAction("_PartialEditCategory", "BudgetItemCategories", new { id = ViewBag.EditCategoryId }); }
+        }
+    </div>
+    <div class="tile">
+        @{ Html.RenderAction("_PartialCategoryIndex", "BudgetItemCategories", null); }
+    </div>
+</div>
+<div class="col-md-6">
+    <div class="tile" style="overflow:auto">
+        @if (userHelper.IsHOH() || userHelper.EditBudget())
+        {
+            if (ViewBag.EditItemId == null)
+            {
+                { Html.RenderAction("_PartialCreateBudgetItems", "BudgetItems", null); }
+            }
+
+            { Html.RenderAction("_PartialEditBudgetItems", "BudgetItems", new { id = ViewBag.EditItemId }); }
+        }
+    </div>  
+    <div class="tile">
+        @{ Html.RenderAction("_PartialBudgetItemsIndex", "BudgetItems", null); }
+    </div>
+</div>

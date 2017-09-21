@@ -1,0 +1,71 @@
+﻿<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.css">
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="center">
+            <button class="btn btn-xs" id="goback"> < Month</button>
+            <button class="btn btn-sm" id="gobackY"> < Year</button>
+            <span class="fontOutline"> Expenses Vs Budget for <span id="monthYear" style="color:blue"></span></span>
+            <button class="btn btn-sm" id="goforwardY">Year ></button>
+            <button class="btn btn-xs" id="goforward">Month ></button>
+        </div>
+
+        <div class="widget">
+
+            <div class="widget-body">
+                <div id="chart1">
+                </div>
+            </div>
+        </div>
+        <div class="center">
+            <button  style="background-color:blue" type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#catModal">Click Here To View Categories Pie Chart</button>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="catModal" role="dialog">
+    <div class="modal-dialog modal-lg" >
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Category Data for <span id="currentMonth"></span></h4>
+            </div>
+            <div class="modal-body">
+                <h3 class="center" id="catName"></h3>
+                <div id="pieContainer" class="center m-t-20" style="height:400px; width:400px">
+                    <canvas id="myChart" max-height="400" max-widht="400">Click a category to see chart.</canvas>
+                </div>
+                <div class="center">
+                    @foreach (var category in ViewBag.Categories)
+                    {
+                        <button class="btn btn-xs bisque" id="@category.Id">@category.Name</button>
+                    }
+                </div>
+                <h3 class="center">Click on category to see pie chart data.</h3>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+            
+        </div>
+    </div>
+
+</div>
+   
+
+
+<script src="~/Scripts/jquery-1.12.4.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.js"></script>
+<script src="~/Scripts/BudgetItemsChartStuff.js"></script>
+
+

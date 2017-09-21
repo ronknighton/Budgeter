@@ -1,0 +1,90 @@
+﻿@model Budgeter.Models.BankAccount
+@using Budgeter.Helpers
+@{
+    ViewBag.Title = "Details";
+    var userHelper = new UsersHelper();
+}
+<div class="col-md-offset-4 col-md-4">
+    <h2 class="center">Bank Account Details</h2>
+
+    <div>
+        <h4>BankAccount</h4>
+        <hr />
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayNameFor(model => model.AccountOwner.FullName)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.AccountOwner.FullName)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.AccountType.Type)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.AccountType.Type)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Household.Name)
+            </dt>
+            
+            <dd>
+                @Html.DisplayFor(model => model.Household.Name)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Name)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Name)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Balance)
+            </dt>
+
+            <dd>
+                $@Html.DisplayFor(model => model.Balance)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.WarningBalance)
+            </dt>
+
+            <dd>
+                $@Html.DisplayFor(model => model.WarningBalance)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.BankName)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.BankName)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.AccountNumber)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.AccountNumber)
+            </dd>
+
+        </dl>
+    </div>
+    <p>
+        @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+        @if (userHelper.IsHOH())
+        {
+            @Html.ActionLink("Back to List", "Index")
+        }
+        else
+        {
+            @Html.ActionLink("Back to List", "UserIndex")
+        }
+    </p>
+    </div>
