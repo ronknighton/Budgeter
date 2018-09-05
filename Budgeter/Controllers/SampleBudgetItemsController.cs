@@ -10,7 +10,7 @@ using Budgeter.Models;
 
 namespace Budgeter.Controllers
 {
-    [RequireHttps]
+    //[RequireHttps]
     public class SampleBudgetItemsController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();

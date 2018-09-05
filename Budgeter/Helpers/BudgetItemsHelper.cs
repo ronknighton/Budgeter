@@ -35,6 +35,29 @@ namespace Budgeter.Helpers
             return new List<int>();
         }
 
+        public List<BudgetItem> GetBudgetItemsList()
+        {
+            var user = db.Users.Find(HttpContext.Current.User.Identity.GetUserId());
+            var houseHold = new Household();
+            var budget = new Budget();
+            var budgetItems = new List<BudgetItem>();
+            if (user != null)
+            {
+                var household = db.Households.FirstOrDefault(h => h.Id == user.HouseholdId);
+                if (household != null)
+                {
+                    budget = db.Budgets.FirstOrDefault(b => b.HouseholdId == household.Id && b.Active);
+
+                    if (budget != null)
+                    {
+                        budgetItems = db.BudgetItems.Where(b => b.BudgetId == budget.Id && b.Active).OrderBy(n => n.Name).ToList();
+                    }
+                }
+                return budgetItems;
+            }
+            return new List<BudgetItem>();
+        }
+
         public int GetItemPercentage(int id)
         {
             DateTime today = DateTime.Today;

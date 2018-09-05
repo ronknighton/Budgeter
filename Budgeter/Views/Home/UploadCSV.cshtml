@@ -1,0 +1,155 @@
+﻿@using Budgeter.Helpers
+@model IEnumerable<Budgeter.Models.UploadedTransaction>
+@{
+    ViewBag.Title = "TestCSV";
+
+}
+
+
+
+@*@Html.ActionLink("Read CSV", "ReadCsv", "Home")*@
+
+<div class="col-md-offset-4 col-md-4">
+    <div class="tile">
+        <div class="p-15">
+            @using (Html.BeginForm("UploadTransactions", "UploadedTransactions", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            {
+                <h2 class="text-center">Upload Transactions</h2>
+                <h4>Select Bank Account</h4>
+                <div class="row">
+                    @Html.DropDownList("BankAccountId", null, htmlAttributes: new { @class = "col-md-10 form-control", required = "required" })
+                    @*@Html.ValidationMessageFor(model => model.BankAccountId, "", new { @class = "text-danger" })*@
+
+                </div>
+                <h4>Select File To Upload</h4>
+                <div>
+                    <input type="file" name="UploadedFile" />
+                   
+                </div>
+                <div class="row">
+                    <div class="col-md-2 p-15" style="padding-bottom: 15px">
+
+                        <input type="submit" name="Submit" value="Submit" />
+
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+@*Begin enter transactions form*@
+
+@if (Model != null)
+{
+    <h4>@Html.Label("Bank-Account"): @ViewBag.BankAccountName</h4>
+    <table class="table">
+        <tr>
+            <th>
+                @Html.Label("Description")
+            </th>
+            <th>
+                @Html.Label("Amount")
+            </th>
+
+            <th>
+                @Html.Label("Budget-Item")
+            </th>
+            @*<th>
+                    @Html.Label("Bank-Account")
+                </th>*@
+            <th>
+                @Html.Label("Income/Expense")
+            </th>
+            <th>
+                @Html.Label("Date")
+            </th>
+            <th>
+                Submit
+            </th>
+        </tr>
+        @foreach (var transaction in Model.Where(t => t.Saved == false))
+        {
+            var incExp = "";
+            if (transaction.Amount < 0)
+            {
+                transaction.Amount = transaction.Amount * -1;
+                incExp = "Expense";
+            }
+            else
+            {
+                incExp = "Income";
+            }
+
+            using (Html.BeginForm("CsvCreate", "Transactions",
+        new
+        {
+            IncomeExpense = incExp,
+            Created = transaction.Created,
+            Description = transaction.Description,
+            Amount = transaction.Amount,
+            BankAccountId = transaction.BankAccountId,
+            IncomeExpenseId = transaction.IncomeExpenseId,
+            UploadedTransactionId = transaction.Id
+
+        },
+        FormMethod.Post, null))
+            {
+                @Html.AntiForgeryToken()
+                @*@Html.Hidden("BankAccountId") = ViewBag.SelectedBankAccountId;
+                    @Html.Hidden("Created") = transaction.Created;
+                    @Html.Hidden("Description") = transaction.Description;
+                    @Html.Hidden("Amount") = transaction.Amount;*@
+
+
+
+                <tr>
+                    <td>
+                        @Html.Label(transaction.Description, new { htmlAttributes = new { @class = "form-control", disabled = "disabled", @Value = transaction.Description } })
+                        @*@Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })*@
+                    </td>
+                    <td style="width: 120px;">
+                        @Html.DisplayFor(modelItem => transaction.Amount, new { htmlAttributes = new { @class = "form-control", disabled = "disabled", @Value = transaction.Amount } })
+                        @*@Html.ValidationMessageFor(model => model.Amount, "", new { @class = "text-danger" })*@
+                    </td>
+
+                    <td>
+                        @Html.DropDownList("BudgetItemId", null, string.Empty, htmlAttributes: new { @class = "form-control" })
+                        @*@Html.ValidationMessageFor(model => model.BudgetItemId, "", new { @class = "text-danger" })*@
+                    </td>
+                    @*<td>
+                            @Html.DropDownList("BankAccountId", null, htmlAttributes: new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.BankAccountId, "", new { @class = "text-danger" })
+                        </td>*@
+                    <td>
+                        @Html.Label(incExp)
+                        @* @Html.Editor(, new { htmlAttribute = new { @class = "form-control", disabled = "disabled", @Value = incExp } })*@
+                        @*@Html.ValidationMessageFor(model => model.IncomeExpenseId, "", new { @class = "text-danger" })*@
+                    </td>
+                    <td>
+                        @Html.Label(transaction.Created.ToString(), new { htmlAttributes = new { @class = "form-control datepicker", disabled = "disabled" } })
+                        @*@Html.ValidationMessageFor(model => model.Created, "", new { @class = "text-danger" })*@
+                    </td>
+                    <td>
+                        <input id="create" type="submit" value="Create" class="btn btn-default" />
+                    </td>
+                </tr>
+
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+            }
+
+        }
+    </table>
+}
+
+
+@section Scripts{
+    //Jquery Tables
+    <script>
+        $('#scrollTable').DataTable({
+            "scrollY": "600px",
+            "scrollCollapse": true,
+            "paging": true
+        });
+    </script>
+}

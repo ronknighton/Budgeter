@@ -15,7 +15,7 @@ using System.Globalization;
 
 namespace Budgeter.Controllers
 {
-    [RequireHttps]
+   // [RequireHttps]
     public class TransactionsController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
@@ -23,6 +23,8 @@ namespace Budgeter.Controllers
         private NotificationsHelper notificationsHelper = new NotificationsHelper();
         private UsersHelper userHelper = new UsersHelper();
         private BudgetItemsHelper budgetItemsHelper = new BudgetItemsHelper();
+        private HouseholdsHelper householdHelper = new HouseholdsHelper();
+        private CategoriesHelper categoriesHelper = new CategoriesHelper();
 
 
         // GET: Transactions
@@ -112,7 +114,7 @@ namespace Budgeter.Controllers
             var transactions = new List<Transaction>();
             var items = new List<BudgetItem>();
             DateTime today = DateTime.Today;
-            DateTime past12Months = DateTime.Today.AddMonths(-12);
+            DateTime past24Months = DateTime.Today.AddMonths(-24);
 
             ICollection<BudgetItem> listBudgetItems = db.BudgetItems.Where(b => b.BudgetId == budget.Id).ToList();
             ICollection<BudgetItemCategory> listCategories = db.BudgetItemCategories.Where(b => b.BudgetId == budget.Id).ToList();
@@ -138,24 +140,24 @@ namespace Budgeter.Controllers
 
             if (BudgetItems != null)
             {
-                transactions = db.Transactions.Where(t => t.BudgetItemId == (int)BudgetItems && t.Created >= past12Months).ToList();
+                transactions = db.Transactions.Where(t => t.BudgetItemId == (int)BudgetItems && t.Created >= past24Months).ToList();
             }
             else if (Categories != null)
             {
                 items = db.BudgetItems.Where(b => b.CategoryId == Categories && b.BudgetId == budget.Id).ToList();
                 foreach (var item in items)
                 {
-                    var theseTransactions = db.Transactions.Where(t => t.BudgetItemId == item.Id && t.Created >= past12Months).ToList();
+                    var theseTransactions = db.Transactions.Where(t => t.BudgetItemId == item.Id && t.Created >= past24Months).ToList();
                     transactions = transactions.Union(theseTransactions).ToList();
                 }
             }
             else if (BankAccounts != null)
             {
-                transactions = db.Transactions.Where(t => t.BankAccountId == BankAccounts && t.Created >= past12Months).ToList();
+                transactions = db.Transactions.Where(t => t.BankAccountId == BankAccounts && t.Created >= past24Months).ToList();
             }
             else if (IncomeExpense != null)
             {
-                transactions = db.BankAccounts.Where(b => b.HouseholdId == houseHold.Id).SelectMany(t => t.Transactions.Where(tr => tr.IncomeExpense.Id == IncomeExpense && tr.Created >= past12Months)).ToList();
+                transactions = db.BankAccounts.Where(b => b.HouseholdId == houseHold.Id).SelectMany(t => t.Transactions.Where(tr => tr.IncomeExpense.Id == IncomeExpense && tr.Created >= past24Months)).ToList();
             }
             else if (Dates != null)
             {
@@ -295,6 +297,8 @@ namespace Budgeter.Controllers
             ViewBag.IncomeExpenseId = new SelectList(db.IncomeExpenses, "Id", "Type", transaction.IncomeExpenseId);
             return View(transaction);
         }
+
+       
         [NoDirectAccess]
         public ActionResult _PartialEditTransaction(int? id)
         {
@@ -398,7 +402,7 @@ namespace Budgeter.Controllers
         }
 
         //GET: View Transaction Notifications
-        [Authorize]       
+        [Authorize]
         public ActionResult ViewTransactionAlert(int transId)
         {
             var transaction = db.Transactions.FirstOrDefault(t => t.Id == transId);
@@ -513,6 +517,35 @@ namespace Budgeter.Controllers
             return PartialView();
         }
 
+        [NoDirectAccess]
+        public ActionResult EnterSearchDates()
+        {
+            var householdId = householdHelper.GetHouseholdId(); 
+            if (householdId != null)
+            {
+                var household = db.Households.FirstOrDefault(h => h.Id == householdId);
+                var householdlist = household.BankAccounts.ToList();
+                ViewBag.BankAccounts = new SelectList(householdlist, "Id", "Name");
+                return View();
+            }
+
+
+            ViewBag.BankAccounts = new SelectList(new List<BankAccount>(), "Id", "Name");
+            return View();
+        }
+
+
+        [NoDirectAccess]
+        public ActionResult GenerateReport([Bind(Include = "BeginDate, EndDate" )] DateViewModel dateTime, int bankAccountId)
+        {
+            ViewBag.CategoryList = categoriesHelper.GetCategoriesList().Where(c => c.BudgetItems.Any(item => item.Transactions.Count > 0));
+            ViewBag.BudgetItemList = budgetItemsHelper.GetBudgetItemsList();
+            
+            var transactions = db.Transactions.Where(t => t.BankAccountId == bankAccountId && t.Created >= dateTime.BeginDate && t.Created <= dateTime.EndDate).ToList();
+
+            return View(transactions);
+        }
+
         //GET Charts
         [HttpGet]
         //Bar chart data
@@ -548,18 +581,18 @@ namespace Budgeter.Controllers
             BarChart barItem;
             var itemCount = budgetItems.ToList().Count;
 
-            foreach(var item in budgetItems)
+            foreach (var item in budgetItems)
             {
                 barItem = new BarChart();
-                if(itemCount > 8)
+                if (itemCount > 8)
                 {
                     barItem.Name = item.Name.Length <= 9 ? item.Name : item.Name.Substring(0, 9);
                 }
                 else
                 {
-                     barItem.Name = item.Name;
+                    barItem.Name = item.Name;
                 }
-                barItem.Budgeted = item.Amount;              
+                barItem.Budgeted = item.Amount;
                 barItem.Actual = budgetItemsHelper.GetMonthYearSpentAmount(item.Id, tod.Month, tod.Year);
                 barlist.Add(barItem);
             }
@@ -713,7 +746,7 @@ namespace Budgeter.Controllers
             public string CatName { get; set; }
             public string[] Labels { get; set; }
             public decimal[] Data { get; set; }
-            public string[] Colors { get; set; }           
+            public string[] Colors { get; set; }
 
         }
 

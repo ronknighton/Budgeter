@@ -8,13 +8,16 @@ using System.Web;
 using System.Web.Mvc;
 using Budgeter.Models;
 using Microsoft.AspNet.Identity;
+using Budgeter.Helpers;
 
 namespace Budgeter.Controllers
 {
-    [RequireHttps]
+    //[RequireHttps]
     public class BudgetItemCategoriesController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
+        private BudgetsHelper budgetHelper = new BudgetsHelper();
+
 
         // GET: BudgetItemCategories
         [NoDirectAccess]
@@ -88,6 +91,24 @@ namespace Budgeter.Controllers
 
            
             return RedirectToAction("Details", "Budgets", new { id = budgetId });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult CreateFromUploads([Bind(Include = "Id, Name")] BudgetItemCategory budgetItemCategory)
+        {
+            var budgetId = budgetHelper.GetBudgetId();
+           
+            if (ModelState.IsValid && budgetId != null)
+            {
+                budgetItemCategory.BudgetId = budgetId;
+                db.BudgetItemCategories.Add(budgetItemCategory);
+                db.SaveChanges();
+                TempData["Message"] = "Category Created";
+                return RedirectToAction("NextTransaction", "UploadedTransactions");
+            }
+            TempData["Message"] = "ERROR - Category NOT Created!";
+            return RedirectToAction("NextTransaction", "UploadedTransactions");
         }
 
         // GET: BudgetItemCategories/Edit/5

@@ -8,13 +8,15 @@ using System.Web;
 using System.Web.Mvc;
 using Budgeter.Models;
 using Microsoft.AspNet.Identity;
+using Budgeter.Helpers;
 
 namespace Budgeter.Controllers
 {
-    [RequireHttps]
+    //[RequireHttps]
     public class BudgetItemsController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
+        private BudgetsHelper budgetHelper = new BudgetsHelper();
 
         // GET: BudgetItems
         [NoDirectAccess]
@@ -67,6 +69,8 @@ namespace Budgeter.Controllers
             return View();
         }
 
+      
+
         [NoDirectAccess]
         public ActionResult _PartialCreateBudgetItems()
         {
@@ -102,6 +106,25 @@ namespace Budgeter.Controllers
             ViewBag.CategoryId = new SelectList(db.BudgetItemCategories, "Id", "Name", budgetItem.CategoryId);
             return RedirectToAction("Details", "Budgets", new { id = budgetId });
         }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult CreateFromUploads([Bind(Include = "Name,Amount,CategoryId")] BudgetItem budgetItem)
+        {
+            //var budgetId = (int)TempData["BudgetId"];
+            var budgetId = budgetHelper.GetBudgetId();
+            if (ModelState.IsValid && budgetId != null)
+            {
+                budgetItem.Active = true;
+                budgetItem.BudgetId = (int)budgetId;
+                db.BudgetItems.Add(budgetItem);
+                db.SaveChanges();
+                TempData["Message"] = "Budget Item Created";
+                return RedirectToAction("NextTransaction", "UploadedTransactions");
+            }
+            TempData["Message"] = "ERROR - Item NOT Created";
+            return RedirectToAction("NextTransaction", "UploadedTransactions");
+        }
+
 
         // GET: BudgetItems/Edit/5
         [NoDirectAccess]

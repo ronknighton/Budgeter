@@ -10,7 +10,7 @@ using Budgeter.Models;
 
 namespace Budgeter.Controllers
 {
-    [RequireHttps]
+    //[RequireHttps]
     [Authorize]
     public class ManageController : Controller
     {

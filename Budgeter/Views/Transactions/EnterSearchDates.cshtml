@@ -1,0 +1,50 @@
+﻿@model Budgeter.Models.DateViewModel
+@{
+    ViewBag.Title = "EnterSearchDates";
+}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/css/bootstrap-datepicker.css" />
+
+<div class="col-md-offset-4 col-md-4">
+    <div class="tile">
+        <div class="p-15">
+            <h2 class="center">Enter Search Dates</h2>
+            @using (Html.BeginForm("GenerateReport", "Transactions", FormMethod.Get))
+            {
+
+                <div>
+                    @Html.LabelFor(m => m.BeginDate, new { htmlAttributes = new { @class = "form-control col-md-3" } })
+                </div>
+                <div>
+                    @Html.EditorFor(m => m.BeginDate, new { htmlAttributes = new { @class = "form-control datepicker" } })
+                </div>
+                <div>
+                    @Html.LabelFor(m => m.EndDate, new { htmlAttributes = new { @class = "form-control col-md-3 " } })
+                </div>
+                <div>
+                    @Html.EditorFor(m => m.EndDate, new { htmlAttributes = new { @class = "form-control datepicker" } })
+                </div>
+                <div>
+                    @Html.DropDownList("BankAccountId", ViewBag.BankAccounts as SelectList, htmlAttributes: new { @class = "form-control col-md-9" })
+                </div>
+                <div class="row">
+                    <div class="col-md-3">
+                        <input type="submit" value="Search" class="btn btn-default" />
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+
+<script src="~/Scripts/jquery-1.12.4.js"></script>
+<script src="~/Scripts/bootstrap.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/js/bootstrap-datepicker.js"></script>
+
+<script>
+
+    $('.datepicker').datepicker();
+
+</script>
+

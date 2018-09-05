@@ -17,7 +17,7 @@ namespace Budgeter.Migrations
 
         protected override void Seed(Budgeter.Models.ApplicationDbContext context)
         {
-
+            //Debugger in another instance of VS
             if (System.Diagnostics.Debugger.IsAttached == false)
                 System.Diagnostics.Debugger.Launch();
 

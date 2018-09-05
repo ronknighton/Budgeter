@@ -14,7 +14,7 @@ using Budgeter.Helpers;
 
 namespace Budgeter.Controllers
 {
-    [RequireHttps]
+    //[RequireHttps]
     [Authorize]
 
     public class AccountController : Controller

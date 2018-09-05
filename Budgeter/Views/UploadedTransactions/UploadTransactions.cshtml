@@ -1,0 +1,245 @@
+﻿@model IEnumerable<Budgeter.Models.UploadedTransaction>
+    @using Budgeter.Helpers
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/6.6.6/sweetalert2.min.css" rel="stylesheet" />
+
+@{
+    ViewBag.Title = "UploadTransactions";
+}
+
+<h2>UploadTransactions</h2>
+
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>
+            @Html.Label("Description")
+        </th>
+        <th>
+            @Html.Label("Amount")
+        </th>
+
+        <th>
+            @Html.Label("Budget-Item")
+        </th>
+        @*<th>
+                @Html.Label("Bank-Account")
+            </th>*@
+        <th>
+            @Html.Label("Income/Expense")
+        </th>
+        <th>
+            @Html.Label("Date")
+        </th>
+        <th>
+            Submit
+        </th>
+    </tr>
+    </thead>
+    @{
+        var count = 1;
+        var budgetItemsHelper = new BudgetItemsHelper();
+        var budgetItems = budgetItemsHelper.GetBudgetItemsList();
+        var budgetItemsList = new SelectList(budgetItems, "Id", "Name");
+        var categoriesHelper = new CategoriesHelper();
+        var categoryList = new SelectList(categoriesHelper.GetCategoriesList(), "Id", "Name");
+    }
+    <tbody>
+        @foreach (var transaction in Model.Where(t => t.Saved == false))
+        {
+
+
+            var incExp = "";
+            if (transaction.Amount < 0)
+            {
+                transaction.Amount = transaction.Amount * -1;
+                incExp = "Expense";
+            }
+            else
+            {
+                incExp = "Income";
+            }
+
+            using (Html.BeginForm("SaveTransaction", "UploadedTransactions",
+        new
+        {
+            IncomeExpense = incExp,
+            Created = transaction.Created,
+            Description = transaction.Description,
+            Amount = transaction.Amount,
+            BankAccountId = transaction.BankAccountId,
+            IncomeExpenseId = transaction.IncomeExpenseId,
+            UploadedTransactionId = transaction.Id
+
+        },
+        FormMethod.Post, null))
+            {
+                @Html.AntiForgeryToken()
+                @*@Html.Hidden("BankAccountId") = ViewBag.SelectedBankAccountId;
+                    @Html.Hidden("Created") = transaction.Created;
+                    @Html.Hidden("Description") = transaction.Description;
+                    @Html.Hidden("Amount") = transaction.Amount;*@
+
+
+
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => transaction.Description, new { htmlAttributes = new { @class = "form-control", disabled = "disabled" } })
+                        @*@Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })*@
+                    </td>
+                    <td style="width: 120px;">
+                        @Html.DisplayFor(modelItem => transaction.Amount, new { htmlAttributes = new { @class = "form-control", disabled = "disabled" } })
+                        @*@Html.ValidationMessageFor(model => model.Amount, "", new { @class = "text-danger" })*@
+                    </td>
+
+                    <td>
+                        @Html.DropDownList("BudgetItemId", budgetItemsList, "Select", htmlAttributes: new { @class = "form-control", id = count })<br />
+                        @*@Html.DropDownListFor(modelItem => transaction.BudgetItemId, ViewBag.BudgetItemList as SelectList, "Select Budget Item", htmlAttributes: new { @class = "form-control", @Value = "0" })*@
+                        @*@Html.ValidationMessageFor(model => model.BudgetItemId, "", new { @class = "text-danger" })*@
+                        <button type="button" class="btn btn-info btn-xs" data-toggle="modal" data-target="#BCModal">Add New Budget Category</button>
+                        <button type="button" class="btn btn-info btn-xs" data-toggle="modal" data-target="#BIModal">Add New Budget Item</button>
+                    </td>
+
+                    <td>
+                        @Html.Label(incExp)
+                        @* @Html.Editor(, new { htmlAttribute = new { @class = "form-control", disabled = "disabled", @Value = incExp } })*@
+                        @*@Html.ValidationMessageFor(model => model.IncomeExpenseId, "", new { @class = "text-danger" })*@
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modeItem => transaction.Created, new { htmlAttributes = new { @class = "form-control datepicker", disabled = "disabled" } })
+                        @*@Html.ValidationMessageFor(model => model.Created, "", new { @class = "text-danger" })*@
+                    </td>
+                    <td>
+                        <input id=create type="submit" value="Create" class="btn btn-default" />
+                    </td>
+                </tr>
+
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                count++;
+            }
+
+        }
+    </tbody>
+</table>
+
+<!--Add Budget Category Modal -->
+<div id="BCModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Modal Header</h4>
+            </div>
+            <div class="modal-body">
+                <p>Add New Category.</p>
+                @using (Html.BeginForm("CreateFromUploads", "BudgetItemCategories", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+
+                    <table class="table">
+                        <tr>
+                            <th>@Html.Label("Name")</th>
+                            <th>Create</th>
+                        </tr>
+                        <tr>
+                            <td>
+                                @Html.Editor("Name", new { htmlAttributes = new { @class = "form-control" } })
+                                @*@Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })*@
+                            </td>
+                            <td>
+                                <input type="submit" value="Create" class="btn btn-default" />
+                            </td>
+                        </tr>
+                    </table>
+
+                }
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!--Add Budget Item Modal-->
+<div id="BIModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Modal Header</h4>
+            </div>
+            <div class="modal-body">
+                <p>Add New Budget Item.</p>
+              @using (Html.BeginForm("CreateFromUploads", "BudgetItems", FormMethod.Post))
+              {
+                @Html.AntiForgeryToken()
+
+
+                <table class="table">
+                    <tr>
+                        <th>@Html.Label("Name", htmlAttributes: new { @class = "control-label col-md-2" })</th>
+                        <th>@Html.Label("Amount", htmlAttributes: new { @class = "control-label col-md-2" })</th>
+                        <th>@Html.Label("CategoryId", htmlAttributes: new { @class = "control-label col-md-2" })</th>
+                        <th>Create</th>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.Editor("Name", new { htmlAttributes = new { @class = "form-control" } })
+                       @Html.ValidationMessage("Name", "", new { @class = "text-danger" })
+                    </td>
+                    <td>
+                        @Html.Editor("Amount", new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessage("Amount", "", new { @class = "text-danger" })
+                </td>
+                <td>
+                    @Html.DropDownList("CategoryId", categoryList, htmlAttributes: new { @class = "form-control" })
+                @Html.ValidationMessage("CategoryId", "", new { @class = "text-danger" })
+            </td>
+            <td><input type="submit" value="Create" class="btn btn-default" /></td>
+        </tr>
+    </table>
+
+
+              }
+
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts{
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/6.6.6/sweetalert2.min.js"></script>
+
+<script type="text/javascript">
+            $(window).on('load', function () {
+                if('@TempData["Message"]')
+                {
+                    swal('@TempData["Message"]')
+                }
+            });
+</script>
+
+    <script>
+        $('#scrollTable').DataTable({
+            "scrollY": "600px",
+            "scrollCollapse": true,
+            "paging": true
+        });
+    </script>
+
+
+}

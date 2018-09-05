@@ -91,6 +91,9 @@
                     @if (usersHelper.UserHasEverything())
                     {
                         @Html.ActionLink("Transactions", "Index", "Transactions") <br />
+                        @Html.ActionLink("Upload Wells Fargo CSV", "UploadCSV", "Home")<br />
+                        @Html.ActionLink("View Uploads", "NextTransaction", "UploadedTransactions")<br />
+                        @Html.ActionLink("Generate Reports", "EnterSearchDates", "Transactions")<br />
                     }
                     @if (usersHelper.HaveBankAccount())
                     {

@@ -13,6 +13,20 @@ namespace Budgeter.Helpers
         private ApplicationDbContext db = new ApplicationDbContext();
         private UsersHelper usersHelper = new UsersHelper();
 
+        public int? GetHouseholdId()
+        {
+            var user = db.Users.Find(HttpContext.Current.User.Identity.GetUserId());
+            if(user != null)
+            {
+                var household = user.Household;
+                if(household != null)
+                {
+                    return household.Id;
+                }
+            }
+            return null;
+        }
+
         public string GetCreatorName(int hId)
         {
             var household = db.Households.FirstOrDefault(h => h.Id == hId);

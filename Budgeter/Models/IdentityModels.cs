@@ -91,7 +91,6 @@ namespace Budgeter.Models
         public DbSet<Transaction> Transactions { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<Invitation> Invitations { get; set; }
-
-
+        public DbSet<UploadedTransaction> UploadedTransactions { get; set; }
     }
 }

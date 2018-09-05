@@ -11,7 +11,7 @@ using Microsoft.AspNet.Identity;
 
 namespace Budgeter.Controllers
 {
-    [RequireHttps]
+    //[RequireHttps]
     public class BankAccountsController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();

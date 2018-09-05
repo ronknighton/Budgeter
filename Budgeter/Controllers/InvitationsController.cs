@@ -13,7 +13,7 @@ using Budgeter.Helpers;
 
 namespace Budgeter.Controllers
 {
-    [RequireHttps]
+    //[RequireHttps]
     public class InvitationsController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();

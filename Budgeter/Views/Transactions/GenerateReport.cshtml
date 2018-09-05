@@ -1,0 +1,137 @@
+﻿@model IEnumerable<Budgeter.Models.Transaction>
+@using Budgeter.Models
+@{
+    ViewBag.Title = "GenerateReport";
+}
+
+
+
+<h2>Generate Report</h2>
+
+<p>
+    @Html.ActionLink("New Search", "Create")
+</p>
+@{
+    var reportTotal = 0.00M;
+    var incomeTotal = 0.00M;
+    var expenseTotal = 0.00M;
+}
+@foreach (var category in ViewBag.CategoryList)
+{
+
+    var categoryTotal = 0.00M;
+    
+    <br />
+    <h2 class="center">@category.Name</h2>
+
+
+    foreach (var budgetItem in category.BudgetItems)
+    {
+        var budgetItemIncomeTotal = 0.00M;
+        var budgetItemExpenseTotal = 0.00M;
+        var budgetItemName = budgetItem.Name;
+        <table class="table">
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.BankAccount.Name)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.BudgetItem.Name)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.IncomeExpense.Type)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Description)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Created)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Amount)
+                </th>
+            </tr>
+
+
+            @foreach (var item in Model)
+            {
+                if (budgetItem.Id == item.BudgetItemId)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.BankAccount.Name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.BudgetItem.Name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.IncomeExpense.Type)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Description)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Created)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Amount)
+                        </td>
+
+
+                    </tr>
+
+
+
+
+                    if (item.IncomeExpense.Type == "Expense")
+                    {
+                        expenseTotal += item.Amount;
+                        budgetItemExpenseTotal += item.Amount;
+                        categoryTotal -= item.Amount;
+                    }
+                    else
+                    {
+                        incomeTotal += item.Amount;
+                        budgetItemIncomeTotal += item.Amount;
+                        categoryTotal += item.Amount;
+                    }
+
+                }
+
+
+            }
+
+        </table>
+        <h4 class="alignRight"><strong>@budgetItemName</strong> </h4>
+        <h5 class="alignRight">Income Total: $@budgetItemIncomeTotal</h5>
+        <h5 class="alignRight">Expense Total: $@budgetItemExpenseTotal</h5>
+        
+        var biTotal = Math.Abs(budgetItemIncomeTotal - budgetItemExpenseTotal);
+        
+        <h5 class="alignRight">Budget Item Total: $@biTotal</h5>
+    }
+
+
+    <br />
+    var catTotal = Math.Abs(categoryTotal);
+    <h3 class="alignRight"><strong>@category.Name Total: </strong>$@catTotal</h3>
+        <br />
+        <hr />
+    reportTotal += categoryTotal;
+}
+<h3>Total Income: $@incomeTotal</h3>
+<h3>Total Expenditures: $@expenseTotal</h3>
+@{ 
+    var reportProfit = incomeTotal - expenseTotal;
+}
+<h2>Total Profit: $@reportProfit</h2>
+
+@section Scripts{
+    <script>
+        $('#scrollTable').DataTable({
+            "scrollY": "600px",
+            "scrollCollapse": true,
+            "paging": true
+        });
+    </script>
+}
